@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="rd_d3drender.cpp">
+      <Filter>rd_render</Filter>
+    </ClCompile>
+    <ClCompile Include="rd_timer.cpp">
+      <Filter>rd_core\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="rd_d3drender.h">
+      <Filter>rd_render</Filter>
+    </ClInclude>
+    <ClInclude Include="rd_app.h" />
+    <ClInclude Include="rd_core.h">
+      <Filter>rd_core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="rd_render.h">
+      <Filter>rd_core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="rd_string.h">
+      <Filter>rd_core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="rd_timer.h">
+      <Filter>rd_core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="rd_trace.h">
+      <Filter>rd_core\include</Filter>
+    </ClInclude>
+    <ClInclude Include="rd_types.h">
+      <Filter>rd_core\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="rd_render">
+      <UniqueIdentifier>{c4a13c68-93c3-4a5d-91b1-bef978b6aaed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rd_core">
+      <UniqueIdentifier>{6d129ab3-909c-40c6-abaf-83bdd02e6f52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rd_core\include">
+      <UniqueIdentifier>{e388c6f5-4ac1-41dc-8ea6-ec848f4bcd53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rd_core\src">
+      <UniqueIdentifier>{7ec4e076-f3c8-44f5-a746-cdd8193a6b19}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,7 +1,43 @@
 #include <Windows.h>
 #include "rd_core.h"
+#include "rd_app.h"
 
 HWND g_hWnd = NULL;
+
+void rd_init()
+{
+	IRender* render = GetRender();
+	if (! render)
+		return;
+	render->InitDevice();
+}
+
+void rd_release()
+{
+	IRender* render = GetRender();
+	if (! render)
+		return;
+	render->ReleaseDevice();
+}
+
+void rd_render()
+{
+	IRender* render = GetRender();
+	if (! render)
+		return;
+	
+	QWORD start_time = GetTimer()->GetTime();
+
+	render->BeginScene();
+
+	// do something
+
+
+	render->EndScene();
+	QWORD end_time = GetTimer()->GetTime();
+	float ms = GetTimer()->GetTimeMillisec(end_time - start_time);
+	DEBUG_TRACE("frame time in ms:%f\tfps:%d\n", ms, (int)(1000 / ms));
+}
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -47,6 +83,8 @@ int main(int argc, char* argv[])
 	ShowWindow(g_hWnd, SW_SHOW);
 	UpdateWindow(g_hWnd);
 
+	rd_init();
+
 	while (true)
 	{
 		MSG msg;
@@ -58,8 +96,10 @@ int main(int argc, char* argv[])
 			DispatchMessage(&msg);
 		}
 		else
-			Sleep(0);
+			rd_render();
 	}
+
+	rd_release();
 
 	return 0;
 }
