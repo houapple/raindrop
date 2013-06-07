@@ -41,10 +41,14 @@ void CDeviceInfo::PrintAdapterIdentifier()
 }
 
 //////////////////////////////////////////////////////////////////////////
+#define MAX_VERTEX_SIZE	1024 * 10
+#define MAX_INDEX_SIZE	1024 * 10
 
 CRender::CRender()
 : m_pD3D(NULL)
 , m_pD3DDevice(NULL)
+, m_pVB(NULL)
+, m_pIB(NULL)
 {
 
 }
@@ -109,6 +113,7 @@ void CRender::InitDevice()
 	else
 		vp = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
+	// Create device
 	D3DPRESENT_PARAMETERS d3dpp;
 	ZeroMemory(&d3dpp, sizeof(d3dpp));
 	d3dpp.BackBufferCount = 1;
@@ -127,19 +132,46 @@ void CRender::InitDevice()
 		DEBUG_TRACE("Create device failed!\n");
 		return;
 	}
+
+	DEBUG_TRACE("Create device succeed!\n");
+
+	SetUp();
 }
 
 void CRender::ReleaseDevice()
 {
+	SAFE_RELEASE(m_pVB);
+	SAFE_RELEASE(m_pIB);
 	SAFE_RELEASE(m_pD3DDevice);
 	SAFE_RELEASE(m_pD3D);
+}
+
+void CRender::SetUp()
+{
+	if (! m_pD3DDevice)
+		return;
+	if (FAILED(m_pD3DDevice->CreateVertexBuffer(MAX_VERTEX_SIZE, D3DUSAGE_WRITEONLY, Vertex::FVF, D3DPOOL_DEFAULT, &m_pVB, NULL)))
+	{
+		DEBUG_TRACE("Create vertex buffer failed!\n");
+		return;
+	}
+	
+	if (FAILED(m_pD3DDevice->CreateIndexBuffer(MAX_INDEX_SIZE, D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &m_pIB, NULL)))
+	{
+		DEBUG_TRACE("Create index buffer failed!\n");
+		return;
+	}
+
+	m_pD3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+
+	DEBUG_TRACE("Set up succeed!\n");
 }
 
 void CRender::BeginScene()
 {
 	if (! m_pD3DDevice)
 		return;
-	m_pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 255, 0), 1.0f, 0);
+	m_pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	m_pD3DDevice->BeginScene();
 }
 
@@ -147,8 +179,64 @@ void CRender::EndScene()
 {
 	if (! m_pD3DDevice)
 		return;
+
 	m_pD3DDevice->EndScene();
 	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+}
+
+void CRender::Render()
+{
+	BeginScene();
+
+	while (! m_queueUnit.empty())
+	{
+		stUnit& u = m_queueUnit.front();
+		
+		void* pVertex = NULL;
+		m_pVB->Lock(0, 0, &pVertex, 0);
+		memcpy(pVertex, u.pVertex, u.vertexSize);
+		m_pVB->Unlock();
+
+		void* pIndex = NULL;
+		m_pIB->Lock(0, 0, &pIndex, 0);
+		memcpy(pIndex, u.pIndex, u.indexSize);
+		m_pIB->Unlock();
+
+		rd_free(u.pVertex);
+		rd_free(u.pIndex);
+
+		m_pD3DDevice->SetStreamSource(0, m_pVB, 0, u.singleVertexSize);
+		m_pD3DDevice->SetIndices(m_pIB);
+		m_pD3DDevice->SetFVF(Vertex::FVF);
+
+		m_pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, u.vertexSize / u.singleVertexSize, 0, u.size);
+
+		m_queueUnit.pop();
+	}
+
+	EndScene();
+}
+
+void CRender::DrawTriangeList(DWORD size, const Vertex* vertex, DWORD vertexNum, const WORD* index, DWORD indexNum)
+{
+	if (! vertex)
+		return;
+	int alloc_size = sizeof(Vertex) * vertexNum;
+	
+	stUnit u;
+	u.size = size;
+	u.pVertex = rd_malloc(alloc_size);
+	memcpy(u.pVertex, vertex, alloc_size);
+	u.singleVertexSize = sizeof(Vertex);
+	u.vertexSize = alloc_size;
+	if (index && indexNum != 0)
+	{
+		alloc_size = sizeof(WORD) * indexNum;
+		u.pIndex = rd_malloc(alloc_size);
+		memcpy(u.pIndex, index, alloc_size);
+		u.indexSize = alloc_size;
+	}
+	m_queueUnit.push(u);
 }
 
 

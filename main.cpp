@@ -1,8 +1,11 @@
 #include <Windows.h>
+#include <time.h>
 #include "rd_core.h"
 #include "rd_app.h"
 
 HWND g_hWnd = NULL;
+const int width = 800;
+const int height = 600;
 
 void rd_init()
 {
@@ -10,6 +13,8 @@ void rd_init()
 	if (! render)
 		return;
 	render->InitDevice();
+
+	srand(time(NULL));
 }
 
 void rd_release()
@@ -20,6 +25,35 @@ void rd_release()
 	render->ReleaseDevice();
 }
 
+void RandomTriange()
+{
+	IRender* render = GetRender();
+	if (! render)
+		return;
+
+	const int max_size = 9000;
+	Vertex* v = (Vertex* )rd_malloc(max_size * sizeof(Vertex));
+	for (int i = 0; i < max_size; ++i)
+	{
+		v[i].x = rand() % width;
+		v[i].y = rand() % height;
+		v[i].z = 0.0f;
+		v[i].w = 1.0f;
+		v[i].color = D3DCOLOR_ARGB(255, 0, 255, 0);
+	}
+
+	WORD* index = (WORD*)rd_malloc(sizeof(WORD) * max_size / 3);
+	for (int i = 0; i < max_size / 3; ++i)
+	{
+		index[i] = i;
+	}
+
+	render->DrawTriangeList(max_size / 3, v, max_size, index, max_size / 3);
+
+	rd_free(v);
+	rd_free(index);
+}
+
 void rd_render()
 {
 	IRender* render = GetRender();
@@ -27,13 +61,10 @@ void rd_render()
 		return;
 	
 	QWORD start_time = GetTimer()->GetTime();
+	
+	RandomTriange();
+	render->Render();
 
-	render->BeginScene();
-
-	// do something
-
-
-	render->EndScene();
 	QWORD end_time = GetTimer()->GetTime();
 	float ms = GetTimer()->GetTimeMillisec(end_time - start_time);
 	DEBUG_TRACE("frame time in ms:%f\tfps:%d\n", ms, (int)(1000 / ms));
@@ -73,7 +104,7 @@ int main(int argc, char* argv[])
 	}
 
 	g_hWnd = CreateWindow(wc.lpszClassName, "Raindrop Window", WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, wc.hInstance, NULL);
+		CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, wc.hInstance, NULL);
 	if (! g_hWnd)
 	{
 		DEBUG_VS_TRACE("CreateWindow failed!\n");
