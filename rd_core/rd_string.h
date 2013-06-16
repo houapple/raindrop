@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _RD_STRING_H
+#define _RD_STRING_H
+
 #include <string.h>
 
 inline const char* avar(const char* format, ...)
@@ -23,3 +25,5 @@ inline void rd_strncpy(char* pDest, const char* pSrc, int destSize)
 	memcpy(pDest, pSrc, len);
 	*(pDest + len - 1) = 0;
 }
+
+#endif

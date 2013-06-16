@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _RD_DEVICE_H
+#define _RD_DEVICE_H
 
 #include "../rd_render/rd_render.h"
 #include "../rd_core/rd_core.h"
@@ -48,3 +49,5 @@ private:
 };
 
 NAMESPACE_END
+
+#endif

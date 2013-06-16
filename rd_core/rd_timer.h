@@ -1,4 +1,5 @@
-#pragma once
+#ifndef	_RD_TIMER_H
+#define	_RD_TIMER_H
 
 #include "rd_types.h"
 
@@ -18,3 +19,5 @@ private:
 	QWORD	m_lCpuTicksPerSec;
 	funcGetTime	m_pfunc;
 };
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _RD_CORE_H
+#define _RD_CORE_H
 
 #include "rd_types.h"
 #include "rd_trace.h"
@@ -20,3 +21,4 @@
 #define SAFE_FREE(p)		{ if (p) rd_free(p); p = NULL; }
 #define SAFE_RELEASE(p)		{ if (p) p->Release(); p = NULL; }
 
+#endif

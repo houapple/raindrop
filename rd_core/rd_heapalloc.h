@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _RD_HEAPALLOC_H
+#define _RD_HEAPALLOC_H
+
 #include <stdlib.h>
 
 #define rd_malloc(s) _rd_malloc(s, __FILE__, __LINE__)
@@ -13,3 +15,5 @@ inline void _rd_free(void* p)
 {
 	free(p);
 }
+
+#endif

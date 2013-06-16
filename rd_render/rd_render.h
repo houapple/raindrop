@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _RD_RENDER_H
+#define _RD_RENDER_H
+
 #include "../rd_core/rd_types.h"
 
 struct VertexBase
@@ -19,3 +21,5 @@ public:
 	virtual void EndScene() = 0;
 	virtual void Render() = 0;
 };
+
+#endif

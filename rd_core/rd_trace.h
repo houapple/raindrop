@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _RD_TRACE_H
+#define _RD_TRACE_H
+
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -16,3 +18,4 @@ inline void DebugTrace(const char* format, ...)
 	printf(buffer);
 }
 
+#endif
