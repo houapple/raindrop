@@ -1,6 +1,6 @@
 #pragma once
-#include "rd_render.h"
-#include "rd_d3drender.h"
+#include "../rd_render/rd_render.h"
+#include "../rd_d3d/rd_device.h"
 #include "rd_timer.h"
 
 inline HWND GetWnd()

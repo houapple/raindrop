@@ -1,12 +1,13 @@
 #pragma once
-#include "rd_types.h"
+#include "../rd_core/rd_types.h"
 
-struct Vertex
+struct VertexBase
 {
 	float x, y, z, w;
 	DWORD color;
-	static const DWORD FVF;
 };
+#define VertexBase_FVF	D3DFVF_XYZRHW | D3DFVF_DIFFUSE
+
 
 class IRender
 {
@@ -17,6 +18,4 @@ public:
 	virtual void BeginScene() = 0;
 	virtual void EndScene() = 0;
 	virtual void Render() = 0;
-	// Draw triange list, use index buffer if index != NULL
-	virtual void DrawTriangeList(DWORD size, const Vertex* vertex, DWORD vertexNum, const WORD* index, DWORD indexNum) = 0;
 };

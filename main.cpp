@@ -1,7 +1,6 @@
 #include <Windows.h>
 #include <time.h>
-#include "rd_core.h"
-#include "rd_app.h"
+#include "rd_core/rd_app.h"
 
 HWND g_hWnd = NULL;
 const int width = 800;
@@ -25,35 +24,6 @@ void rd_release()
 	render->ReleaseDevice();
 }
 
-void RandomTriange()
-{
-	IRender* render = GetRender();
-	if (! render)
-		return;
-
-	const int max_size = 9000;
-	Vertex* v = (Vertex* )rd_malloc(max_size * sizeof(Vertex));
-	for (int i = 0; i < max_size; ++i)
-	{
-		v[i].x = rand() % width;
-		v[i].y = rand() % height;
-		v[i].z = 0.0f;
-		v[i].w = 1.0f;
-		v[i].color = D3DCOLOR_ARGB(255, 0, 255, 0);
-	}
-
-	WORD* index = (WORD*)rd_malloc(sizeof(WORD) * max_size / 3);
-	for (int i = 0; i < max_size / 3; ++i)
-	{
-		index[i] = i;
-	}
-
-	render->DrawTriangeList(max_size / 3, v, max_size, index, max_size / 3);
-
-	rd_free(v);
-	rd_free(index);
-}
-
 void rd_render()
 {
 	IRender* render = GetRender();
@@ -62,7 +32,6 @@ void rd_render()
 	
 	QWORD start_time = GetTimer()->GetTime();
 	
-	RandomTriange();
 	render->Render();
 
 	QWORD end_time = GetTimer()->GetTime();
