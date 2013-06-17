@@ -3,14 +3,6 @@
 
 #include "../rd_core/rd_types.h"
 
-struct VertexBase
-{
-	float x, y, z, w;
-	DWORD color;
-};
-#define VertexBase_FVF	D3DFVF_XYZRHW | D3DFVF_DIFFUSE
-
-
 class IRender
 {
 public:
@@ -19,7 +11,8 @@ public:
 
 	virtual void BeginScene() = 0;
 	virtual void EndScene() = 0;
-	virtual void Render() = 0;
+
+	virtual void DrawRect(const RectF& rect, DWORD color) = 0;
 };
 
 #endif

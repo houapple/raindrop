@@ -5,6 +5,7 @@
 #include <stdarg.h>
 
 #define DEBUG_TRACE		DebugTrace
+#define DEBUG_DXTRACE	DebugDXTrace
 #define DEBUG_VS_TRACE	OutputDebugString
 
 inline void DebugTrace(const char* format, ...)
@@ -16,6 +17,11 @@ inline void DebugTrace(const char* format, ...)
 	va_end(ap);
 	buffer[1023] = 0;
 	printf(buffer);
+}
+
+inline void DebugDXTrace(DWORD hr)
+{
+
 }
 
 #endif

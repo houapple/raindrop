@@ -29,14 +29,7 @@ void rd_render()
 	IRender* render = GetRender();
 	if (! render)
 		return;
-	
-	QWORD start_time = GetTimer()->GetTime();
-	
-	render->Render();
-
-	QWORD end_time = GetTimer()->GetTime();
-	float ms = GetTimer()->GetTimeMillisec(end_time - start_time);
-	DEBUG_TRACE("frame time in ms:%f\tfps:%d\n", ms, (int)(1000 / ms));
+	render->DrawRect(RectF(10, 10, 50, 50), 0xffffffff);
 }
 
 
@@ -96,7 +89,17 @@ int main(int argc, char* argv[])
 			DispatchMessage(&msg);
 		}
 		else
+		{
+			QWORD start_time = GetTimer()->GetTime();
+			
+			GetRender()->BeginScene();
 			rd_render();
+			GetRender()->EndScene();
+
+			QWORD end_time = GetTimer()->GetTime();
+			float ms = GetTimer()->GetTimeMillisec(end_time - start_time);
+			DEBUG_TRACE("frame time in ms:%f\tfps:%d\n", ms, (int)(1000 / ms));
+		}
 	}
 
 	rd_release();

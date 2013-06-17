@@ -102,14 +102,15 @@ template <class T> struct Rect_T
 
 	// op
 	Rect_T& operator=(const Rect_T<T>& rhs) { CopyRect(&rhs); return *this; }
-	Rect_T& operator&=(const Rect_T<T>& rhs) { left = max(left, rhs.left); right = min(right, lhs.right); top = max(top, rhs.top); bottom = min(bottom, rhs.bottom); }
+	Rect_T& operator&=(const Rect_T<T>& rhs) { left = max(left, rhs.left); top = max(top, rhs.top); right = min(right, rhs.right); bottom = min(bottom, rhs.bottom); }
+	Rect_T& operator|=(const Rect_T<T>& rhs) { left = min(left, rhs.left); top = min(top, rhs.top); right = max(right, rhs.right); bottom = max(bottom, rhs.bottom); }
 
 	void CopyRect(Rect_T<T>* pSrc) { memcpy(this, pSrc, sizeof(Rect_T<T>)); }
+	void SetRect(T l, T t, T r, T b) { left = l; top = t; right = r; bottom = b; }
 
 	T Width() { return right - left; }
 	T Height() { return bottom - top; }
 	Vec2_T<T> CenterPoint() { return Vec2_T<T>((left + right) / (T)2.0, (top + bottom) / (T)2.0); }
-
 
 	bool IsRectEmpty() { return left >= right || bottom >= top; }
 	template<class T1> bool PtInRect(const Vec2_T<T1>& pt) { return pt.x >= left && pt.x <= right && pt.y >= top && pt.y <= bottom; }

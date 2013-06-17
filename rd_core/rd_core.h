@@ -1,6 +1,8 @@
 #ifndef _RD_CORE_H
 #define _RD_CORE_H
 
+#pragma warning(disable:4996)
+
 #include "rd_types.h"
 #include "rd_trace.h"
 #include "rd_string.h"
