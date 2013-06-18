@@ -29,7 +29,11 @@ void rd_render()
 	IRender* render = GetRender();
 	if (! render)
 		return;
-	render->DrawRect(RectF(10, 10, 50, 50), 0xffffffff);
+
+	for (int i = 0; i < 100; ++i)
+	{
+		render->DrawRect(RectF(rand() % width, rand() % height, rand() % width, rand() % height), 0xffffffff);
+	}
 }
 
 

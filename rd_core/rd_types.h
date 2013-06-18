@@ -108,12 +108,12 @@ template <class T> struct Rect_T
 	void CopyRect(Rect_T<T>* pSrc) { memcpy(this, pSrc, sizeof(Rect_T<T>)); }
 	void SetRect(T l, T t, T r, T b) { left = l; top = t; right = r; bottom = b; }
 
-	T Width() { return right - left; }
-	T Height() { return bottom - top; }
-	Vec2_T<T> CenterPoint() { return Vec2_T<T>((left + right) / (T)2.0, (top + bottom) / (T)2.0); }
+	T Width() const { return right - left; }
+	T Height() const { return bottom - top; }
+	Vec2_T<T> CenterPoint() const { return Vec2_T<T>((left + right) / (T)2.0, (top + bottom) / (T)2.0); }
 
-	bool IsRectEmpty() { return left >= right || bottom >= top; }
-	template<class T1> bool PtInRect(const Vec2_T<T1>& pt) { return pt.x >= left && pt.x <= right && pt.y >= top && pt.y <= bottom; }
+	bool IsRectEmpty() const { return left >= right || bottom >= top; }
+	template<class T1> bool PtInRect (const Vec2_T<T1>& pt) const { return pt.x >= left && pt.x <= right && pt.y >= top && pt.y <= bottom; }
 	
 	template<class T1> void OffsetRect(T1 x, T1 y) { left += (T)x; right += (T)x; top += (T)y; bottom += (T)y; }
 	template<class T1> void OffsetRect(const Vec2_T<T1>& pt) { OffsetRect(pt.x, pt.y); }

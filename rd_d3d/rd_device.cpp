@@ -187,6 +187,8 @@ void CRender::EndScene()
 
 void CRender::DrawRect(const RectF& rect, DWORD color)
 {
+	if (rect.IsRectEmpty())
+		return;
 	HRESULT hr = S_OK;
 	VertexBase* v = NULL;
 	int vb_size = sizeof(VertexBase) * 5;
