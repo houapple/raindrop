@@ -189,7 +189,7 @@ void CRender::DrawRect(const RectF& rect, DWORD color)
 {
 	HRESULT hr = S_OK;
 	VertexBase* v = NULL;
-	int vb_size = sizeof(VertexBase) * 4;
+	int vb_size = sizeof(VertexBase) * 5;
 	hr = m_pVB->Lock(m_dwVBOffset, vb_size, (void**)&v, D3DLOCK_NOOVERWRITE);
 	if (FAILED(hr))
 	{
@@ -201,31 +201,14 @@ void CRender::DrawRect(const RectF& rect, DWORD color)
 	v[1].x = rect.right;	v[1].y = rect.top;		v[1].z = 0.0f;	v[1].w = 1.0f;	v[1].color = color;
 	v[2].x = rect.right;	v[2].y = rect.bottom;	v[2].z = 0.0f;	v[2].w = 1.0f;	v[2].color = color;
 	v[3].x = rect.left;		v[3].y = rect.bottom;	v[3].z = 0.0f;	v[3].w = 1.0f;	v[3].color = color;
+	v[4].x = rect.left;		v[4].y = rect.top;		v[4].z = 0.0f;	v[4].w = 1.0f;	v[4].color = color;
 	m_pVB->Unlock();
 
-	WORD* w = NULL;
-	int ib_size = 6 *sizeof(WORD);
-	hr = m_pIB->Lock(m_dwIBOffset, ib_size, (void**)&w, D3DLOCK_NOOVERWRITE);
-	if (FAILED(hr))
-	{
-		DEBUG_DXTRACE(hr);
-		return;
-	}
-
-	// 0 1
-	// 3 2
-	w[0] = 3;	w[1] = 0;	w[2] = 1;
-	w[3] = 3;	w[4] = 1;	w[5] = 2;
-	m_pIB->Unlock();
-
-	m_pD3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
-	m_pD3DDevice->SetIndices(m_pIB);
 	m_pD3DDevice->SetFVF(VertexBase_FVF);
-	m_pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, m_dwVBOffset, 0, 4, m_dwIBOffset, 2);
+	m_pD3DDevice->DrawPrimitive(D3DPT_LINESTRIP, m_dwVBOffset, 4);
 
 	m_dwVBOffset += vb_size;
-	m_dwIBOffset += ib_size;
 }
 
 
