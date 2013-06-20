@@ -16,9 +16,16 @@ struct VertexBase
 
 NAMESPACE_BEGINE(d3d)
 
-class CDeviceInfo
+#define DEBUG_DXTRACE	DebugDXTrace
+
+inline void DebugDXTrace(HRESULT hr)
 {
-public:
+
+}
+
+
+struct stDeviceInfo
+{
 	D3DDISPLAYMODE display_mode;
 	D3DADAPTER_IDENTIFIER9 adapter_identifer;
 	D3DCAPS9 caps;
@@ -26,26 +33,24 @@ public:
 	void PrintDisplayMode(D3DDISPLAYMODE& display_mode);
 	void PrintCurDisplayMode() { PrintDisplayMode(display_mode); }
 	void PrintAdapterIdentifier();
+	void PrintCaps();
 };
 
-
-class CRender : public IRender
+class CDevice : public IRender
 {
 public:
-	CRender();
-	~CRender();
+	CDevice();
+	~CDevice();
 	
 	void InitDevice();
-
 	void ReleaseDevice();
-	
 	void SetUp();
 	
-	void BeginScene();
-	
+	void BeginScene();	
 	void EndScene();
 
 	void DrawRect(const RectF& rect, DWORD color);
+	void DrawLine(const Vec2F& pt0, const Vec2F& pt1, DWORD color);
 private:
 	IDirect3D9*				m_pD3D;
 	IDirect3DDevice9*		m_pD3DDevice;
@@ -56,7 +61,7 @@ private:
 	DWORD m_dwIBOffset;
 
 	HWND m_hWnd;
-	CDeviceInfo m_DeviceInfo;
+	stDeviceInfo m_DeviceInfo;
 };
 
 NAMESPACE_END

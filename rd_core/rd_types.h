@@ -112,7 +112,7 @@ template <class T> struct Rect_T
 	T Height() const { return bottom - top; }
 	Vec2_T<T> CenterPoint() const { return Vec2_T<T>((left + right) / (T)2.0, (top + bottom) / (T)2.0); }
 
-	bool IsRectEmpty() const { return left >= right || bottom >= top; }
+	bool IsRectEmpty() const { return left >= right || top >= bottom; }
 	template<class T1> bool PtInRect (const Vec2_T<T1>& pt) const { return pt.x >= left && pt.x <= right && pt.y >= top && pt.y <= bottom; }
 	
 	template<class T1> void OffsetRect(T1 x, T1 y) { left += (T)x; right += (T)x; top += (T)y; bottom += (T)y; }

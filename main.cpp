@@ -30,9 +30,18 @@ void rd_render()
 	if (! render)
 		return;
 
-	for (int i = 0; i < 100; ++i)
+	render->DrawLine(Vec2F(100, 0), Vec2F(0, 100), 0xffffffff);
+
+	render->DrawLine(Vec2F(10, 10), Vec2F(100, 100), 0xffffffff);
+
+	for (int i = 0; i < 1; ++i)
 	{
-		render->DrawRect(RectF(rand() % width, rand() % height, rand() % width, rand() % height), 0xffffffff);
+		int l = rand() % width;
+		int t = rand() % height;
+		int r = rand() % width;
+		int b = rand() % height;
+
+		render->DrawRect(RectF(min(l,r), min(t, b), max(r, l) + 1, max(b, t) + 1), 0xffffffff);
 	}
 }
 

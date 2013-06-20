@@ -23,4 +23,6 @@
 #define SAFE_FREE(p)		{ if (p) rd_free(p); p = NULL; }
 #define SAFE_RELEASE(p)		{ if (p) p->Release(); p = NULL; }
 
+#define count_of(x)		(sizeof(x[0]) != 0 ? sizeof(x) / sizeof(x[0]) : 0)
+
 #endif

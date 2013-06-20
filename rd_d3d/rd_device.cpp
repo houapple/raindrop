@@ -3,7 +3,7 @@
 
 NAMESPACE_BEGINE(d3d)
 
-void CDeviceInfo::PrintDisplayMode(D3DDISPLAYMODE& display_mode)
+void stDeviceInfo::PrintDisplayMode(D3DDISPLAYMODE& display_mode)
 {
 	std::string fmt;
 	switch (display_mode.Format)
@@ -29,7 +29,7 @@ void CDeviceInfo::PrintDisplayMode(D3DDISPLAYMODE& display_mode)
 	DEBUG_TRACE("Width:%d\tHeight:%d\tRefreshRate:%d\tFormat:%s\n", display_mode.Width, display_mode.Height, display_mode.RefreshRate, fmt.c_str());
 }
 
-void CDeviceInfo::PrintAdapterIdentifier()
+void stDeviceInfo::PrintAdapterIdentifier()
 {
 	DEBUG_TRACE("Adapter info:\nDirver:%s\nDescription:%s", adapter_identifer.Driver, adapter_identifer.Description);
 	DWORD Product = HIWORD(adapter_identifer.DriverVersion.HighPart);
@@ -39,11 +39,18 @@ void CDeviceInfo::PrintAdapterIdentifier()
 	DEBUG_TRACE("\t%d.%d.%d.%d\n", Product, Version, SubVersion, Build);
 }
 
-//////////////////////////////////////////////////////////////////////////
-#define MAX_VERTEX_SIZE	1024 * 10
-#define MAX_INDEX_SIZE	1024 * 10
+void stDeviceInfo::PrintCaps()
+{
+	DEBUG_TRACE("dev caps:\n");
+	if (caps.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
+		DEBUG_TRACE("Device supports stream offsets \n");
+}
 
-CRender::CRender()
+//////////////////////////////////////////////////////////////////////////
+#define MAX_VERTEX_SIZE	4096 * sizeof(VertexBase) * 4
+#define MAX_INDEX_SIZE	4096 * sizeof(WORD) * 6
+
+CDevice::CDevice()
 : m_pD3D(NULL)
 , m_pD3DDevice(NULL)
 , m_pVB(NULL)
@@ -54,12 +61,12 @@ CRender::CRender()
 
 }
 
-CRender::~CRender()
+CDevice::~CDevice()
 {
 
 }
 
-void CRender::InitDevice()
+void CDevice::InitDevice()
 {
 	m_hWnd = GetWnd();
 	m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -107,6 +114,7 @@ void CRender::InitDevice()
 		DEBUG_TRACE("Get device caps failed!\n");
 		return;
 	}
+	m_DeviceInfo.PrintCaps();
 
 	int vp = 0;
 	if (m_DeviceInfo.caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
@@ -139,7 +147,7 @@ void CRender::InitDevice()
 	SetUp();
 }
 
-void CRender::ReleaseDevice()
+void CDevice::ReleaseDevice()
 {
 	SAFE_RELEASE(m_pVB);
 	SAFE_RELEASE(m_pIB);
@@ -147,7 +155,7 @@ void CRender::ReleaseDevice()
 	SAFE_RELEASE(m_pD3D);
 }
 
-void CRender::SetUp()
+void CDevice::SetUp()
 {
 	if (! m_pD3DDevice)
 		return;
@@ -164,9 +172,10 @@ void CRender::SetUp()
 	}
 
 	DEBUG_TRACE("Set up succeed!\n");
+//	m_pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 }
 
-void CRender::BeginScene()
+void CDevice::BeginScene()
 {
 	if (! m_pD3DDevice)
 		return;
@@ -176,7 +185,7 @@ void CRender::BeginScene()
 	m_dwVBOffset = 0;
 }
 
-void CRender::EndScene()
+void CDevice::EndScene()
 {
 	if (! m_pD3DDevice)
 		return;
@@ -185,7 +194,7 @@ void CRender::EndScene()
 	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
 }
 
-void CRender::DrawRect(const RectF& rect, DWORD color)
+void CDevice::DrawRect(const RectF& rect, DWORD color)
 {
 	if (rect.IsRectEmpty())
 		return;
@@ -208,7 +217,30 @@ void CRender::DrawRect(const RectF& rect, DWORD color)
 
 	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
 	m_pD3DDevice->SetFVF(VertexBase_FVF);
-	m_pD3DDevice->DrawPrimitive(D3DPT_LINESTRIP, m_dwVBOffset, 4);
+	m_pD3DDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, 4);
+
+	m_dwVBOffset += vb_size;
+}
+
+void CDevice::DrawLine(const Vec2F& pt0, const Vec2F& pt1, DWORD color)
+{
+	HRESULT hr = S_OK;
+	VertexBase* v = NULL;
+	int vb_size = sizeof(VertexBase) * 2;
+	hr = m_pVB->Lock(m_dwVBOffset, vb_size, (void**)&v, D3DLOCK_NOOVERWRITE);
+	if (FAILED(hr))
+	{
+		DEBUG_DXTRACE(hr);
+		return;
+	}
+
+	v[0].x = pt0.x;		v[0].y = pt0.y;		v[0].z = 0.0f;	v[0].w = 1.0f;	v[0].color = color;
+	v[1].x = pt1.x;		v[1].y = pt1.y;		v[1].z = 0.0f;	v[1].w = 1.0f;	v[1].color = color;
+	m_pVB->Unlock();
+
+	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
+	m_pD3DDevice->SetFVF(VertexBase_FVF);
+	m_pD3DDevice->DrawPrimitive(D3DPT_LINELIST, 0, 1);
 
 	m_dwVBOffset += vb_size;
 }

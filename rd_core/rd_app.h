@@ -13,7 +13,7 @@ inline HWND GetWnd()
 
 inline IRender* GetRender()
 {
-	static d3d::CRender render;
+	static d3d::CDevice render;
 	return &render;
 }
 

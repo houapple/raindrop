@@ -5,7 +5,6 @@
 #include <stdarg.h>
 
 #define DEBUG_TRACE		DebugTrace
-#define DEBUG_DXTRACE	DebugDXTrace
 #define DEBUG_VS_TRACE	OutputDebugString
 
 inline void DebugTrace(const char* format, ...)
