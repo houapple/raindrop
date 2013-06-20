@@ -222,6 +222,34 @@ void CDevice::DrawRect(const RectF& rect, DWORD color)
 	m_dwVBOffset += vb_size;
 }
 
+void CDevice::FillRect(const RectF& rect, DWORD color)
+{
+	if (rect.IsRectEmpty())
+		return;
+	HRESULT hr = S_OK;
+	VertexBase* v = NULL;
+	int vb_size = sizeof(VertexBase) * 4;
+	hr = m_pVB->Lock(m_dwVBOffset, vb_size, (void**)&v, D3DLOCK_NOOVERWRITE);
+	if (FAILED(hr))
+	{
+		DEBUG_DXTRACE(hr);
+		return;
+	}
+
+	v[0].x = rect.left;		v[0].y = rect.bottom;	v[0].z = 0.0f;	v[0].w = 1.0f;	v[0].color = color;
+	v[1].x = rect.left;		v[1].y = rect.top;		v[1].z = 0.0f;	v[1].w = 1.0f;	v[1].color = color;
+	v[2].x = rect.right;	v[2].y = rect.bottom;	v[2].z = 0.0f;	v[2].w = 1.0f;	v[2].color = color;
+	v[3].x = rect.right;	v[3].y = rect.top;		v[3].z = 0.0f;	v[3].w = 1.0f;	v[3].color = color;
+	m_pVB->Unlock();
+
+	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
+	m_pD3DDevice->SetFVF(VertexBase_FVF);
+	m_pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+	m_dwVBOffset += vb_size;
+}
+
+
 void CDevice::DrawLine(const Vec2F& pt0, const Vec2F& pt1, DWORD color)
 {
 	HRESULT hr = S_OK;
@@ -241,6 +269,37 @@ void CDevice::DrawLine(const Vec2F& pt0, const Vec2F& pt1, DWORD color)
 	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
 	m_pD3DDevice->SetFVF(VertexBase_FVF);
 	m_pD3DDevice->DrawPrimitive(D3DPT_LINELIST, 0, 1);
+
+	m_dwVBOffset += vb_size;
+}
+
+void CDevice::DrawLineStrip(const Vec2F* p, DWORD num, DWORD color)
+{
+	if (! p || num < 2)
+		return;
+	HRESULT hr = S_OK;
+	VertexBase* v = NULL;
+	int vb_size = sizeof(VertexBase) * num;
+	hr = m_pVB->Lock(m_dwVBOffset, vb_size, (void**)&v, D3DLOCK_NOOVERWRITE);
+	if (FAILED(hr))
+	{
+		DEBUG_DXTRACE(hr);
+		return;
+	}
+	
+	for (DWORD i = 0; i < num; ++i, ++v, ++p)
+	{
+		v->x = p->x;
+		v->y = p->y;
+		v->z = 0.0f;
+		v->w = 1.0f;
+		v->color = color;
+	}
+	m_pVB->Unlock();
+
+	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
+	m_pD3DDevice->SetFVF(VertexBase_FVF);
+	m_pD3DDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, num - 1);
 
 	m_dwVBOffset += vb_size;
 }

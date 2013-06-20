@@ -4,6 +4,8 @@
 #include "../rd_render/rd_render.h"
 #include "../rd_d3d/rd_device.h"
 #include "rd_timer.h"
+#include "rd_fps.h"
+#include <windows.h>
 
 inline HWND GetWnd()
 {
@@ -22,5 +24,20 @@ inline CTimer* GetTimer()
 	static CTimer timer;
 	return &timer;
 }
+
+class CApp
+{
+public:
+	CApp() {}
+	virtual ~CApp() {}
+
+	void Create(int width, int height, const char* window_name);
+	bool Loop();
+
+	virtual void Run(float fElapsedTime) {}
+	virtual void Draw(float fElapsedTime) {}
+protected:
+	CFps m_fps;
+};
 
 #endif

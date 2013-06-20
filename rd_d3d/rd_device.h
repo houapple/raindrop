@@ -50,7 +50,9 @@ public:
 	void EndScene();
 
 	void DrawRect(const RectF& rect, DWORD color);
+	void FillRect(const RectF& rect, DWORD color);
 	void DrawLine(const Vec2F& pt0, const Vec2F& pt1, DWORD color);
+	void DrawLineStrip(const Vec2F* p, DWORD num, DWORD color);
 private:
 	IDirect3D9*				m_pD3D;
 	IDirect3DDevice9*		m_pD3DDevice;

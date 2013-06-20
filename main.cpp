@@ -1,30 +1,16 @@
-#include <Windows.h>
-#include <time.h>
 #include "rd_core/rd_app.h"
 
-HWND g_hWnd = NULL;
 const int width = 800;
 const int height = 600;
 
-void rd_init()
+class CGameApp : public CApp
 {
-	IRender* render = GetRender();
-	if (! render)
-		return;
-	render->InitDevice();
+public:
+	void Run(float fElapsedTime) { }
+	void Draw(float fElapsedTime);
+};
 
-	srand(time(NULL));
-}
-
-void rd_release()
-{
-	IRender* render = GetRender();
-	if (! render)
-		return;
-	render->ReleaseDevice();
-}
-
-void rd_render()
+void CGameApp::Draw(float fElapsedTime)
 {
 	IRender* render = GetRender();
 	if (! render)
@@ -43,79 +29,24 @@ void rd_render()
 
 		render->DrawRect(RectF(min(l,r), min(t, b), max(r, l) + 1, max(b, t) + 1), 0xffffffff);
 	}
-}
 
+	render->FillRect(RectF(10, 10, 50, 50), 0xffff0000);
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	}
-	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	std::vector<Vec2F> vec;
+	vec.push_back(Vec2F(30, 32));
+	vec.push_back(Vec2F(80, 67));
+	vec.push_back(Vec2F(70, 93));
+	vec.push_back(Vec2F(120, 170));
+	vec.push_back(Vec2F(45, 220));
+	vec.push_back(Vec2F(20, 376));
+
+	render->DrawLineStrip(&vec[0], vec.size(), 0xff00ff00);
 }
 
 int main(int argc, char* argv[])
 {
-
-	WNDCLASS wc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hbrBackground = NULL;
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hIcon = NULL;
-	wc.hInstance = GetModuleHandle(NULL);
-	wc.lpfnWndProc = WndProc;
-	wc.lpszClassName = "Raindrop class";
-	wc.lpszMenuName = NULL;
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	
-	if (! RegisterClass(&wc))
-	{
-		DEBUG_VS_TRACE("RegisterClass failed!\n");
-		return 0;
-	}
-
-	g_hWnd = CreateWindow(wc.lpszClassName, "Raindrop Window", WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, wc.hInstance, NULL);
-	if (! g_hWnd)
-	{
-		DEBUG_VS_TRACE("CreateWindow failed!\n");
-		return 0;
-	}
-
-	ShowWindow(g_hWnd, SW_SHOW);
-	UpdateWindow(g_hWnd);
-
-	rd_init();
-
-	while (true)
-	{
-		MSG msg;
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			if (msg.message == WM_QUIT)
-				break;
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		else
-		{
-			QWORD start_time = GetTimer()->GetTime();
-			
-			GetRender()->BeginScene();
-			rd_render();
-			GetRender()->EndScene();
-
-			QWORD end_time = GetTimer()->GetTime();
-			float ms = GetTimer()->GetTimeMillisec(end_time - start_time);
-			DEBUG_TRACE("frame time in ms:%f\tfps:%d\n", ms, (int)(1000 / ms));
-		}
-	}
-
-	rd_release();
-
+	CGameApp theApp;
+	theApp.Create(width, height, "Rain drop");
+	theApp.Loop();
 	return 0;
 }
