@@ -20,4 +20,10 @@ private:
 	funcGetTime	m_pfunc;
 };
 
+inline CTimer* GetTimer()
+{
+	static CTimer timer;
+	return &timer;
+}
+
 #endif

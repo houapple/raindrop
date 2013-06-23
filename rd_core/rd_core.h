@@ -8,6 +8,7 @@
 #include "rd_math.h"
 #include "rd_string.h"
 #include "rd_heapalloc.h"
+#include "rd_timer.h"
 
 #include <vector>
 #include <string>
@@ -27,6 +28,8 @@
 #define SAFE_RELEASE(p)		{ if ((p)) (p)->Release(); (p) = NULL; }
 
 #define count_of(x)		(sizeof((x)[0]) != 0 ? sizeof((x)) / sizeof((x)[0]) : 0)
+
+#define MAX_NAMESZIE	32
 
 template<class T>
 inline void rd_swap(T& a, T& b)
@@ -68,5 +71,26 @@ inline void free_list(std::vector<T*>& vec)
 	}
 	vec.clear();
 }
+
+class CFuncTime
+{
+	char sz[MAX_NAMESZIE];
+	QWORD start_time;
+	int limit;
+public:
+	CFuncTime(const char* desc, int limit = 0)
+	{
+		rd_strncpy(sz, desc,sizeof(sz));
+		start_time = GetTimer()->GetTime();
+		this->limit = limit;
+	}
+	~CFuncTime()
+	{
+		QWORD end_time = GetTimer()->GetTime();
+		float f = GetTimer()->GetTimeMillisec(end_time - start_time);
+		if (f > limit)
+			DEBUG_TRACE("%s time: %f\n", sz, f);
+	}
+};
 
 #endif

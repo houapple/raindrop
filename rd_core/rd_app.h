@@ -20,18 +20,6 @@ inline IRender* GetRender()
 	return &render;
 }
 
-inline CTimer* GetTimer()
-{
-	static CTimer timer;
-	return &timer;
-}
-
-inline CCursor* GetAppCursor()
-{
-	static CCursor cursor;
-	return &cursor;
-}
-
 struct stSysInfo
 {
 	RectI	m_windowRect;

@@ -49,6 +49,19 @@ static bool SortNode(CAStar::stNode* node1, CAStar::stNode* node2)
 	return node1->f < node2->f;
 }
 
+int heuristic(Vec2I start, Vec2I end)
+{
+/*	int dx = abs(start.x - end.x);
+	int dy = abs(start.y - end.y);
+	int D = 5;
+	if (dx > dy)
+		return D * dx;
+	else
+		return D * dy;
+		*/
+	return square_distance<int>(start, end);
+}
+
 bool CAStar::FindPath(Vec2I ptBegin, Vec2I ptEnd)
 {
 	if (! m_tileJudge || ptBegin == ptEnd)
@@ -58,7 +71,7 @@ bool CAStar::FindPath(Vec2I ptBegin, Vec2I ptEnd)
 	stNode* node = (stNode*)rd_malloc(sizeof(stNode));
 	node->pt = ptBegin;
 	node->g = 0.0f;
-	node->h = square_distance<int>(ptBegin, ptEnd);
+	node->h = heuristic(ptBegin, ptEnd);
 	node->f = node->g + node->h;
 	node->parent = NULL;
 	memset(node->child, 0, sizeof(node->child));
@@ -68,6 +81,7 @@ bool CAStar::FindPath(Vec2I ptBegin, Vec2I ptEnd)
 	stNode* best_node = NULL;
 	for (;;)
 	{
+		CFuncTime func_time("for", 1);
 		if (m_vecOpen.empty())
 			break;
 		std::sort(m_vecOpen.begin(), m_vecOpen.end(), SortNode);
@@ -134,6 +148,7 @@ bool CAStar::FindPath(Vec2I ptBegin, Vec2I ptEnd)
 
 void CAStar::GenerateSucc(stNode* best_node, Vec2I pt, Vec2I ptEnd)
 {
+	CFuncTime func_time("GenerateSucc", 1);
 	stNode* old_node = NULL;
 	int g = best_node->g + 1;
 	int c = 0;
@@ -183,7 +198,7 @@ void CAStar::GenerateSucc(stNode* best_node, Vec2I pt, Vec2I ptEnd)
 		stNode* new_node = (stNode*)rd_malloc(sizeof(stNode));
 		new_node->pt = pt;
 		new_node->g = g;
-		new_node->h = square_distance<int>(pt, ptEnd);
+		new_node->h = heuristic(pt, ptEnd);
 		new_node->f = new_node->g + new_node->h;
 		new_node->parent = best_node;
 		memset(new_node->child, 0, sizeof(new_node->child));
@@ -203,6 +218,8 @@ void CAStar::GenerateSucc(stNode* best_node, Vec2I pt, Vec2I ptEnd)
 
 CAStar::stNode* CAStar::FindNode(std::vector<stNode*>& vec, Vec2I pt)
 {
+	CFuncTime func_time("FindNode", 1);
+
 	for (int i = 0; i < vec.size(); ++i)
 	{
 		if (vec[i]->pt == pt)
@@ -213,6 +230,7 @@ CAStar::stNode* CAStar::FindNode(std::vector<stNode*>& vec, Vec2I pt)
 
 void CAStar::PropagateDown(stNode* node)
 {
+	CFuncTime func_time("PropagateDown", 1);
 	std::stack<stNode*>  stack_node;
 	stack_node.push(node);
 

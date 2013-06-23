@@ -18,4 +18,10 @@ private:
 	Vec2I	m_Position;
 };
 
+inline CCursor* GetAppCursor()
+{
+	static CCursor cursor;
+	return &cursor;
+}
+
 #endif
