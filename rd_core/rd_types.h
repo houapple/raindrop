@@ -1,6 +1,7 @@
 #ifndef _RD_TYPES_H
 #define _RD_TYPES_H
 
+
 #ifndef BYTE
 typedef unsigned char		BYTE;
 #endif
@@ -58,7 +59,7 @@ Vec2_T<T1> operator-(const Vec2_T<T1>& lhs,const Vec2_T<T2>& rhs)
 }
 
 template<class T1, class T2>
-Vec2_T<T1>& operator+=(const Vec2_T<T1>& lhs,const Vec2_T<T2>& rhs)
+Vec2_T<T1>& operator+=(Vec2_T<T1>& lhs,const Vec2_T<T2>& rhs)
 {
 	lhs.x += rhs.x;
 	lhs.y += rhs.y;
@@ -66,7 +67,7 @@ Vec2_T<T1>& operator+=(const Vec2_T<T1>& lhs,const Vec2_T<T2>& rhs)
 }
 
 template<class T1, class T2>
-Vec2_T<T1>& operator-=(const Vec2_T<T1>& lhs,const Vec2_T<T2>& rhs)
+Vec2_T<T1>& operator-=(Vec2_T<T1>& lhs,const Vec2_T<T2>& rhs)
 {
 	lhs.x -= rhs.x;
 	lhs.y -= rhs.y;
@@ -85,6 +86,12 @@ bool operator!=(const Vec2_T<T>& lhs,const Vec2_T<T>& rhs)
 	return ! (lhs == rhs);
 }
 
+template<class T>
+inline T square_distance(const Vec2_T<T>& pt1, const Vec2_T<T>& pt2)
+{
+	return (pt1.x - pt2.x) * (pt1.x - pt2.x) + (pt1.y - pt2.y) * (pt1.y - pt2.y);
+}
+
 typedef Vec2_T<int>		Vec2I;
 typedef Vec2_T<long>	Vec2L;
 typedef Vec2_T<float>	Vec2F;
@@ -99,13 +106,15 @@ template <class T> struct Rect_T
 	Rect_T(T l, T t, T r, T b) : left(l), top(t), right(r), bottom(b) {}
 	Rect_T(const Rect_T<T>& rhs) { CopyRect(&rhs); }
 	Rect_T(const Rect_T<T>* p) { CopyRect(p); }
+//	Rect_T(const RECT& rect) { left = rect.left; top = rect.top; right = rect.right; bottom = rect.bottom; }
 
 	// op
 	Rect_T& operator=(const Rect_T<T>& rhs) { CopyRect(&rhs); return *this; }
+//	Rect_T& operator=(const RECT& rect) { left = rect.left; top = rect.top; right = rect.right; bottom = rect.bottom; }
 	Rect_T& operator&=(const Rect_T<T>& rhs) { left = max(left, rhs.left); top = max(top, rhs.top); right = min(right, rhs.right); bottom = min(bottom, rhs.bottom); }
 	Rect_T& operator|=(const Rect_T<T>& rhs) { left = min(left, rhs.left); top = min(top, rhs.top); right = max(right, rhs.right); bottom = max(bottom, rhs.bottom); }
 
-	void CopyRect(Rect_T<T>* pSrc) { memcpy(this, pSrc, sizeof(Rect_T<T>)); }
+	void CopyRect(const Rect_T<T>* pSrc) { memcpy(this, pSrc, sizeof(Rect_T<T>)); }
 	void SetRect(T l, T t, T r, T b) { left = l; top = t; right = r; bottom = b; }
 
 	T Width() const { return right - left; }

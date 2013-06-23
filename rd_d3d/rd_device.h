@@ -20,7 +20,7 @@ NAMESPACE_BEGINE(d3d)
 
 inline void DebugDXTrace(HRESULT hr)
 {
-
+	printf("Dx error!\n");
 }
 
 
@@ -46,13 +46,15 @@ public:
 	void ReleaseDevice();
 	void SetUp();
 	
-	void BeginScene();	
+	void BeginScene(DWORD color);
 	void EndScene();
 
 	void DrawRect(const RectF& rect, DWORD color);
 	void FillRect(const RectF& rect, DWORD color);
+	void FillRectList(const RectF* rect, DWORD num, DWORD color);
 	void DrawLine(const Vec2F& pt0, const Vec2F& pt1, DWORD color);
 	void DrawLineStrip(const Vec2F* p, DWORD num, DWORD color);
+	void DrawLineList(const Vec2F* p, DWORD num, DWORD color);
 private:
 	IDirect3D9*				m_pD3D;
 	IDirect3DDevice9*		m_pD3DDevice;
@@ -62,7 +64,8 @@ private:
 	DWORD m_dwVBOffset;
 	DWORD m_dwIBOffset;
 
-	HWND m_hWnd;
+	HWND	m_hWnd;
+	RectF	m_CanvasRect;	
 	stDeviceInfo m_DeviceInfo;
 };
 

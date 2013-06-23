@@ -47,8 +47,8 @@ void stDeviceInfo::PrintCaps()
 }
 
 //////////////////////////////////////////////////////////////////////////
-#define MAX_VERTEX_SIZE	4096 * sizeof(VertexBase) * 4
-#define MAX_INDEX_SIZE	4096 * sizeof(WORD) * 6
+#define MAX_VERTEX_SIZE	10000 * sizeof(VertexBase) * 4
+#define MAX_INDEX_SIZE	10000 * sizeof(WORD) * 6
 
 CDevice::CDevice()
 : m_pD3D(NULL)
@@ -57,6 +57,7 @@ CDevice::CDevice()
 , m_pIB(NULL)
 , m_dwVBOffset(0)
 , m_dwIBOffset(0)
+, m_CanvasRect()
 {
 
 }
@@ -171,15 +172,19 @@ void CDevice::SetUp()
 		return;
 	}
 
+	RECT rect;
+	GetClientRect(m_hWnd, &rect);
+	m_CanvasRect.SetRect(rect.left, rect.top, rect.right, rect.bottom);
+
 	DEBUG_TRACE("Set up succeed!\n");
 //	m_pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 }
 
-void CDevice::BeginScene()
+void CDevice::BeginScene(DWORD color)
 {
 	if (! m_pD3DDevice)
 		return;
-	m_pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+	m_pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, color, 1.0f, 0);
 	m_pD3DDevice->BeginScene();
 	m_dwIBOffset = 0;
 	m_dwVBOffset = 0;
@@ -249,6 +254,62 @@ void CDevice::FillRect(const RectF& rect, DWORD color)
 	m_dwVBOffset += vb_size;
 }
 
+void CDevice::FillRectList(const RectF* rect, DWORD num, DWORD color)
+{
+	if (! rect)
+		return;
+	HRESULT hr = S_OK;
+	VertexBase* v = NULL;
+	int vb_size = sizeof(VertexBase) * 4 * num;
+	hr = m_pVB->Lock(m_dwVBOffset, vb_size, (void**)&v, D3DLOCK_NOOVERWRITE);
+	if (FAILED(hr))
+	{
+		DEBUG_DXTRACE(hr);
+		return;
+	}
+
+	for (int i = 0; i < num; ++i)
+	{
+		v->x = rect->left;	v->y = rect->top;		v->z = 0.0f;	v->w = 1.0f;	v->color = color;
+		++v;
+		v->x = rect->right;	v->y = rect->top;		v->z = 0.0f;	v->w = 1.0f;	v->color = color;
+		++v;
+		v->x = rect->right;	v->y = rect->bottom;	v->z = 0.0f;	v->w = 1.0f;	v->color = color;
+		++v;
+		v->x = rect->left;	v->y = rect->bottom;	v->z = 0.0f;	v->w = 1.0f;	v->color = color;
+		++v;	++rect;
+	}
+	m_pVB->Unlock();
+
+	WORD* w = NULL;
+	int ib_size = sizeof(WORD) * 6 * num;
+	hr = m_pIB->Lock(m_dwIBOffset, ib_size, (void**)&w, D3DLOCK_NOOVERWRITE);
+	if (FAILED(hr))
+	{
+		DEBUG_DXTRACE(hr);
+		return;
+	}
+
+	int ib_num = 6 * num;
+	for (int i = 0, j = 0; i < ib_num; i += 6, j += 4)
+	{
+		w[i] = j + 3;
+		w[i + 1] = j;
+		w[i + 2] = j + 1;
+		w[i + 3] = j + 3;
+		w[i + 4] = j + 1;
+		w[i + 5] = j + 2;
+	}
+
+	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
+	m_pD3DDevice->SetIndices(m_pIB);
+	m_pD3DDevice->SetFVF(VertexBase_FVF);
+	m_pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4 * num, 0, 2 * num);
+
+	m_dwVBOffset += vb_size;
+	m_dwIBOffset += ib_size;
+}
+
 
 void CDevice::DrawLine(const Vec2F& pt0, const Vec2F& pt1, DWORD color)
 {
@@ -300,6 +361,39 @@ void CDevice::DrawLineStrip(const Vec2F* p, DWORD num, DWORD color)
 	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
 	m_pD3DDevice->SetFVF(VertexBase_FVF);
 	m_pD3DDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, num - 1);
+
+	m_dwVBOffset += vb_size;
+}
+
+void CDevice::DrawLineList(const Vec2F* p, DWORD num, DWORD color)
+{
+	if (! p || num < 2)
+		return;
+	HRESULT hr = S_OK;
+	VertexBase* v = NULL;
+	int line_num = num / 2;
+	int vb_size = sizeof(VertexBase) * line_num * 2;
+	hr = m_pVB->Lock(m_dwVBOffset, vb_size, (void**)&v, D3DLOCK_NOOVERWRITE);
+	if (FAILED(hr))
+	{
+		DEBUG_DXTRACE(hr);
+		return;
+	}
+
+	for (int i = 0; i < line_num; ++i)
+	{
+		v->x = p->x;	v->y = p->y;	v->z = 0.0f;	v->w = 1.0f;	v->color = color;
+		++v;
+		++p;
+		v->x = p->x;	v->y = p->y;	v->z = 0.0f;	v->w = 1.0f;	v->color = color;
+		++v;
+		++p;
+	}
+	m_pVB->Unlock();
+
+	m_pD3DDevice->SetStreamSource(0, m_pVB, m_dwVBOffset, sizeof(VertexBase));
+	m_pD3DDevice->SetFVF(VertexBase_FVF);
+	m_pD3DDevice->DrawPrimitive(D3DPT_LINELIST, 0, line_num);
 
 	m_dwVBOffset += vb_size;
 }

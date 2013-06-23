@@ -3,6 +3,7 @@
 	
 #include "../rd_render/rd_render.h"
 #include "../rd_d3d/rd_device.h"
+#include "rd_cursor.h"
 #include "rd_timer.h"
 #include "rd_fps.h"
 #include <windows.h>
@@ -25,6 +26,22 @@ inline CTimer* GetTimer()
 	return &timer;
 }
 
+inline CCursor* GetAppCursor()
+{
+	static CCursor cursor;
+	return &cursor;
+}
+
+struct stSysInfo
+{
+	RectI	m_windowRect;
+	RectI	m_deviceRect;
+	
+	Vec2I	m_ClientOffset;
+
+	void SysInfo();
+};
+
 class CApp
 {
 public:
@@ -34,10 +51,13 @@ public:
 	void Create(int width, int height, const char* window_name);
 	bool Loop();
 
-	virtual void Run(float fElapsedTime) {}
+	virtual bool MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual void Run(float fElapsedTime);
 	virtual void Draw(float fElapsedTime) {}
 protected:
-	CFps m_fps;
+	stSysInfo	m_stSys;
+
+	CFps	m_fps;
 };
 
 #endif

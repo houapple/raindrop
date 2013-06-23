@@ -5,13 +5,33 @@ HWND g_hWnd = NULL;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	switch (uMsg)
-	{
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	}
+	CApp* app = (CApp*)GetWindowLong(g_hWnd, GWL_USERDATA);
+	if (app && g_hWnd == hWnd)
+		app->MsgProc(hWnd, uMsg, wParam, lParam);
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+void stSysInfo::SysInfo()
+{
+	int cx_screen = GetSystemMetrics(SM_CXSCREEN);
+	int cy_screen = GetSystemMetrics(SM_CYSCREEN);
+	int cx_full_screen = GetSystemMetrics(SM_CXFULLSCREEN);
+	int cy_full_screen = GetSystemMetrics(SM_CYFULLSCREEN);
+
+	RECT rect;
+	GetWindowRect(g_hWnd, &rect);
+	m_windowRect.SetRect(rect.left, rect.top, rect.right, rect.bottom);
+	MoveWindow(g_hWnd, (cx_screen - m_windowRect.Width()) / 2,  (cy_screen - m_windowRect.Height()) / 2, m_windowRect.Width(), m_windowRect.Height(), false);
+//	MoveWindow(g_hWnd, 0,  0, m_windowRect.Width(), m_windowRect.Height(), false);
+	GetWindowRect(g_hWnd, &rect);
+
+	POINT pt;
+	pt.x = 0;
+	pt.y = 0;
+	ClientToScreen(g_hWnd, &pt);
+	pt.x -= rect.left;
+	pt.y -= rect.top;
+	m_ClientOffset.Set(pt.x, pt.y);
 }
 
 void CApp::Create(int width, int height, const char* window_name)
@@ -44,9 +64,11 @@ void CApp::Create(int width, int height, const char* window_name)
 
 	ShowWindow(g_hWnd, SW_SHOW);
 	UpdateWindow(g_hWnd);
+	SetWindowLong(g_hWnd, GWL_USERDATA, (LONG)this);
 
+	m_stSys.SysInfo();
 	GetRender()->InitDevice();
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 }
 
 bool CApp::Loop()
@@ -69,16 +91,36 @@ bool CApp::Loop()
 
 			m_fps.Run(elpsed_time);
 			Run(elpsed_time);
-			GetRender()->BeginScene();
+			GetRender()->BeginScene(D3DCOLOR_ARGB(255,255,0,0));
 			Draw(elpsed_time);
 			GetRender()->EndScene();
 
 			last_time = curr_time;
-			DEBUG_TRACE("elpsed time:%f\tfps:%f\n", elpsed_time, m_fps.GetFps());
+		//	DEBUG_TRACE("elpsed time:%f\tfps:%f\n", elpsed_time, m_fps.GetFps());
+
 		}
 	}
 
 	GetRender()->ReleaseDevice();
 
 	return false;
+}
+
+void CApp::Run(float fElapsedTime)
+{
+//	GetAppCursor()->Update();
+//	Vec2I position = GetAppCursor()->GetPosition();
+
+//	DEBUG_TRACE("mouse:%d,%d\n", position.x, position.y);
+}
+
+bool CApp::MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	}
+	return true;
 }
