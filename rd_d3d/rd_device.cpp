@@ -1,6 +1,12 @@
 #include "rd_device.h"
 #include "../rd_core/rd_app.h"
 
+IRender* GetRender()
+{
+	static d3d::CDevice render;
+	return &render;
+}
+
 NAMESPACE_BEGINE(d3d)
 
 void stDeviceInfo::PrintDisplayMode(D3DDISPLAYMODE& display_mode)
@@ -67,7 +73,7 @@ CDevice::~CDevice()
 
 }
 
-void CDevice::InitDevice()
+void CDevice::Init()
 {
 	m_hWnd = GetWnd();
 	m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -148,7 +154,7 @@ void CDevice::InitDevice()
 	SetUp();
 }
 
-void CDevice::ReleaseDevice()
+void CDevice::Release()
 {
 	SAFE_RELEASE(m_pVB);
 	SAFE_RELEASE(m_pIB);
@@ -396,6 +402,11 @@ void CDevice::DrawLineList(const Vec2F* p, DWORD num, DWORD color)
 	m_pD3DDevice->DrawPrimitive(D3DPT_LINELIST, 0, line_num);
 
 	m_dwVBOffset += vb_size;
+}
+
+void CDevice::DrawText(const char* text, const Vec2F& pt, BYTE format, DWORD color)
+{
+//	m_pTextOut->DrawText(text, pt, format, color);
 }
 
 

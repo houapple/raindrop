@@ -2,7 +2,7 @@
 #define _RD_APP_H
 	
 #include "../rd_render/rd_render.h"
-#include "../rd_d3d/rd_device.h"
+#include "../rd_core/rd_core.h"
 #include "rd_cursor.h"
 #include "rd_timer.h"
 #include "rd_fps.h"
@@ -14,17 +14,10 @@ inline HWND GetWnd()
 	return g_hWnd;
 }
 
-inline IRender* GetRender()
-{
-	static d3d::CDevice render;
-	return &render;
-}
-
 struct stSysInfo
 {
 	RectI	m_windowRect;
 	RectI	m_deviceRect;
-	
 	Vec2I	m_ClientOffset;
 
 	void SysInfo();
@@ -44,7 +37,6 @@ public:
 	virtual void Draw(float fElapsedTime) {}
 protected:
 	stSysInfo	m_stSys;
-
 	CFps	m_fps;
 };
 

@@ -34,6 +34,7 @@ void stSysInfo::SysInfo()
 	m_ClientOffset.Set(pt.x, pt.y);
 }
 
+//////////////////////////////////////////////////////////////////////////
 void CApp::Create(int width, int height, const char* window_name)
 {
 	WNDCLASS wc;
@@ -67,7 +68,7 @@ void CApp::Create(int width, int height, const char* window_name)
 	SetWindowLong(g_hWnd, GWL_USERDATA, (LONG)this);
 
 	m_stSys.SysInfo();
-	GetRender()->InitDevice();
+	GetRender()->Init();
 	srand((unsigned int)time(NULL));
 }
 
@@ -91,7 +92,7 @@ bool CApp::Loop()
 
 			m_fps.Run(elpsed_time);
 			Run(elpsed_time);
-			GetRender()->BeginScene(D3DCOLOR_ARGB(255,255,0,0));
+			GetRender()->BeginScene(0xffff0000);
 			Draw(elpsed_time);
 			GetRender()->EndScene();
 
@@ -101,7 +102,7 @@ bool CApp::Loop()
 		}
 	}
 
-	GetRender()->ReleaseDevice();
+	GetRender()->Release();
 
 	return false;
 }

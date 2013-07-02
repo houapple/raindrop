@@ -4,7 +4,7 @@
 #include "../rd_render/rd_render.h"
 #include "../rd_core/rd_core.h"
 #include <d3d9.h>
-
+#include <dxerr.h>
 
 struct VertexBase
 {
@@ -16,13 +16,13 @@ struct VertexBase
 
 NAMESPACE_BEGINE(d3d)
 
-#define DEBUG_DXTRACE	DebugDXTrace
+#define DEBUG_DXTRACE(hr)	DebugDXTrace(hr, __FILE__, __LINE__)
 
-inline void DebugDXTrace(HRESULT hr)
+inline void DebugDXTrace(HRESULT hr, const char* file, int line)
 {
-	printf("Dx error!\n");
+	const char* error = DXGetErrorDescription(hr);
+	DEBUG_TRACE("Dx Error: %s:%d %s\n", file, line, error);
 }
-
 
 struct stDeviceInfo
 {
@@ -36,14 +36,15 @@ struct stDeviceInfo
 	void PrintCaps();
 };
 
+class CTextOut;
 class CDevice : public IRender
 {
 public:
 	CDevice();
 	~CDevice();
 	
-	void InitDevice();
-	void ReleaseDevice();
+	void Init();
+	void Release();
 	void SetUp();
 	
 	void BeginScene(DWORD color);
@@ -55,6 +56,8 @@ public:
 	void DrawLine(const Vec2F& pt0, const Vec2F& pt1, DWORD color);
 	void DrawLineStrip(const Vec2F* p, DWORD num, DWORD color);
 	void DrawLineList(const Vec2F* p, DWORD num, DWORD color);
+
+	void DrawText(const char* text, const Vec2F& pt, BYTE format, DWORD color);
 private:
 	IDirect3D9*				m_pD3D;
 	IDirect3DDevice9*		m_pD3DDevice;
@@ -67,6 +70,8 @@ private:
 	HWND	m_hWnd;
 	RectF	m_CanvasRect;	
 	stDeviceInfo m_DeviceInfo;
+
+	CTextOut*	m_pTextOut;
 };
 
 NAMESPACE_END
