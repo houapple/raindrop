@@ -52,17 +52,6 @@ inline bool contain_of(const std::vector<T>& vec, T t)
 }
 
 template<class T>
-inline T* contain_ptr_of(const std::vector<T*>& vec, T* p)
-{
-	for (int i = 0; i < vec.size(); ++i) 
-	{
-		if (p == vec[i])
-			return p;
-	}
-	return NULL;
-}
-
-template<class T>
 inline void free_list(std::vector<T*>& vec)
 {
 	for (int i = 0; i < vec.size(); ++i)

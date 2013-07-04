@@ -19,6 +19,7 @@ typedef unsigned __int64	QWORD;
 #endif
 
 
+
 template <class T>	struct Vec2_T
 {
 	T x, y;

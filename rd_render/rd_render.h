@@ -3,14 +3,14 @@
 
 #include "../rd_core/rd_types.h"
 
-enum eTextFormat
+enum eDrawText
 {
-	eTF_Left	= 0x1,
-	eTF_Top		= 0x2,
-	eTF_Right	= 0x4,
-	eTF_Bottom	= 0x8,
-	eTF_Center	= 0x10,
-	eTF_VCenter	= 0x20,
+	eDT_Left	= 0x1,
+	eDT_Top		= 0x2,
+	eDT_Right	= 0x4,
+	eDT_Bottom	= 0x8,
+	eDT_Center	= 0x10,
+	eDT_VCenter	= 0x20,
 };
 
 class IRender
@@ -29,7 +29,7 @@ public:
 	virtual void DrawLineStrip(const Vec2F* p, DWORD num, DWORD color) = 0;
 	virtual void DrawLineList(const Vec2F* p, DWORD num, DWORD color) = 0;
 
-	virtual void DrawText(const char* text, const Vec2F& pt, BYTE format, DWORD color) = 0;
+	virtual void DrawString(const char* text, const Vec2F& pt, BYTE format, DWORD color) = 0;
 };
 
 IRender* GetRender();

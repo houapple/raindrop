@@ -1,13 +1,12 @@
 #include "rd_device.h"
-#include "../rd_core/rd_app.h"
+#include "rd_textout.h"
+#include "rd_utility.h"
 
 IRender* GetRender()
 {
-	static d3d::CDevice render;
+	static CDevice render;
 	return &render;
 }
-
-NAMESPACE_BEGINE(d3d)
 
 void stDeviceInfo::PrintDisplayMode(D3DDISPLAYMODE& display_mode)
 {
@@ -61,6 +60,7 @@ CDevice::CDevice()
 , m_pD3DDevice(NULL)
 , m_pVB(NULL)
 , m_pIB(NULL)
+, m_pTextOut(NULL)
 , m_dwVBOffset(0)
 , m_dwIBOffset(0)
 , m_CanvasRect()
@@ -75,6 +75,7 @@ CDevice::~CDevice()
 
 void CDevice::Init()
 {
+	extern HWND GetWnd();
 	m_hWnd = GetWnd();
 	m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (! m_pD3D)
@@ -151,11 +152,18 @@ void CDevice::Init()
 
 	DEBUG_TRACE("Create device succeed!\n");
 
+	m_pTextOut = new CTextOut();
+	if (m_pTextOut)
+		m_pTextOut->Init(m_pD3DDevice);
+
 	SetUp();
 }
 
 void CDevice::Release()
 {
+	if (m_pTextOut)
+		m_pTextOut->Release();
+	SAFE_DELETE(m_pTextOut);
 	SAFE_RELEASE(m_pVB);
 	SAFE_RELEASE(m_pIB);
 	SAFE_RELEASE(m_pD3DDevice);
@@ -404,10 +412,7 @@ void CDevice::DrawLineList(const Vec2F* p, DWORD num, DWORD color)
 	m_dwVBOffset += vb_size;
 }
 
-void CDevice::DrawText(const char* text, const Vec2F& pt, BYTE format, DWORD color)
+void CDevice::DrawString(const char* text, const Vec2F& pt, BYTE format, DWORD color)
 {
-//	m_pTextOut->DrawText(text, pt, format, color);
+	m_pTextOut->DrawString(text, pt, format, color);
 }
-
-
-NAMESPACE_END

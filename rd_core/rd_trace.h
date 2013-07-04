@@ -18,9 +18,4 @@ inline void DebugTrace(const char* format, ...)
 	printf(buffer);
 }
 
-inline void DebugDXTrace(DWORD hr)
-{
-
-}
-
 #endif

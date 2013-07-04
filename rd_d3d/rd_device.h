@@ -4,7 +4,6 @@
 #include "../rd_render/rd_render.h"
 #include "../rd_core/rd_core.h"
 #include <d3d9.h>
-#include <dxerr.h>
 
 struct VertexBase
 {
@@ -14,15 +13,6 @@ struct VertexBase
 #define VertexBase_FVF	D3DFVF_XYZRHW | D3DFVF_DIFFUSE
 
 
-NAMESPACE_BEGINE(d3d)
-
-#define DEBUG_DXTRACE(hr)	DebugDXTrace(hr, __FILE__, __LINE__)
-
-inline void DebugDXTrace(HRESULT hr, const char* file, int line)
-{
-	const char* error = DXGetErrorDescription(hr);
-	DEBUG_TRACE("Dx Error: %s:%d %s\n", file, line, error);
-}
 
 struct stDeviceInfo
 {
@@ -57,7 +47,7 @@ public:
 	void DrawLineStrip(const Vec2F* p, DWORD num, DWORD color);
 	void DrawLineList(const Vec2F* p, DWORD num, DWORD color);
 
-	void DrawText(const char* text, const Vec2F& pt, BYTE format, DWORD color);
+	void DrawString(const char* text, const Vec2F& pt, BYTE format, DWORD color);
 private:
 	IDirect3D9*				m_pD3D;
 	IDirect3DDevice9*		m_pD3DDevice;
@@ -73,7 +63,5 @@ private:
 
 	CTextOut*	m_pTextOut;
 };
-
-NAMESPACE_END
 
 #endif

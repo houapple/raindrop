@@ -3,6 +3,11 @@
 
 HWND g_hWnd = NULL;
 
+HWND GetWnd()
+{
+	return g_hWnd;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	CApp* app = (CApp*)GetWindowLong(g_hWnd, GWL_USERDATA);
@@ -94,11 +99,10 @@ bool CApp::Loop()
 			Run(elpsed_time);
 			GetRender()->BeginScene(0xffff0000);
 			Draw(elpsed_time);
+			GetRender()->DrawString(avar("fps:%f  elpsed time:%f", m_fps.GetFps(), elpsed_time), Vec2F(0.0f,0.0f), eDT_Left | eDT_Top, 0xffffffff);
 			GetRender()->EndScene();
 
 			last_time = curr_time;
-		//	DEBUG_TRACE("elpsed time:%f\tfps:%f\n", elpsed_time, m_fps.GetFps());
-
 		}
 	}
 

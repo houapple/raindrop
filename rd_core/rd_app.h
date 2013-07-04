@@ -8,12 +8,6 @@
 #include "rd_fps.h"
 #include <windows.h>
 
-inline HWND GetWnd()
-{
-	extern HWND g_hWnd;
-	return g_hWnd;
-}
-
 struct stSysInfo
 {
 	RectI	m_windowRect;
