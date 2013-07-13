@@ -2,10 +2,10 @@
 #include "rd_textout.h"
 #include "rd_utility.h"
 
-IRender* GetRender()
+IDevice* GetDevice()
 {
-	static CDevice render;
-	return &render;
+	static CDevice device;
+	return &device;
 }
 
 void stDeviceInfo::PrintDisplayMode(D3DDISPLAYMODE& display_mode)

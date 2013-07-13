@@ -34,7 +34,7 @@ public:
 	Vec2I	m_pos;
 
 	void	Init();
-	void	Draw(float fElapsedTime);
+	void	Draw(float elapsed_time);
 	void	Input(Vec2I position);
 
 	stGrid&	GetGrid(int row, int col) { return m_vecGrid[col * GRID_X_NUM + row]; }
@@ -144,20 +144,17 @@ void CMap::Init()
 	m_Astar.SetTileJudge(this);
 }
 
-void CMap::Draw(float fElapsedTime)
+void CMap::Draw(float elapsed_time)
 {
-	IRender* render = GetRender();
-	if (! render)
-		return;
 //	clear back to red, then do not need draw red grid
 //	render->FillRectList(&m_vecRect[0], m_vecRect.size(), 0xffff0000);
-	render->FillRectList(&m_vecBlock[0], m_vecBlock.size(), 0xff000000);
-	render->FillRect(m_rect, 0xffffff00);
-	render->DrawLineList(&m_vecBackLine[0], m_vecBackLine.size(), 0xff000000);
+	GetDevice()->FillRectList(&m_vecBlock[0], m_vecBlock.size(), 0xff000000);
+	GetDevice()->FillRect(m_rect, 0xffffff00);
+	GetDevice()->DrawLineList(&m_vecBackLine[0], m_vecBackLine.size(), 0xff000000);
 
 	if (! m_findPath.empty())
 	{
-		render->DrawLineStrip(&m_findPath[0], m_findPath.size(), 0xffffffff);
+		GetDevice()->DrawLineStrip(&m_findPath[0], m_findPath.size(), 0xffffffff);
 	}
 }
 
@@ -192,8 +189,8 @@ void CMap::Input(Vec2I position)
 class CGameApp : public CApp
 {
 public:
-	void Run(float fElapsedTime);
-	void Draw(float fElapsedTime);
+	void Run(float elapsed_time);
+	void Draw(float elapsed_time);
 
 	void Init();
 	bool MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -206,14 +203,14 @@ void CGameApp::Init()
 	m_Map.Init();
 }
 
-void CGameApp::Draw(float fElapsedTime)
+void CGameApp::Draw(float elapsed_time)
 {
-	m_Map.Draw(fElapsedTime);
+	m_Map.Draw(elapsed_time);
 }
 
-void CGameApp::Run(float fElapsedTime)
+void CGameApp::Run(float elapsed_time)
 {
-	CApp::Run(fElapsedTime);
+	CApp::Run(elapsed_time);
 }
 
 bool CGameApp::MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

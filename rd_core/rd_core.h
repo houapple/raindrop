@@ -31,6 +31,16 @@
 
 #define MAX_NAMESZIE	32
 
+struct stResDesc
+{
+	char filename[MAX_NAMESZIE];
+	stResDesc(const char* name)
+	{
+		rd_strncpy(filename, name, sizeof(filename));
+	}
+};
+
+
 template<class T>
 inline void rd_swap(T& a, T& b)
 {

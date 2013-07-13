@@ -73,7 +73,7 @@ void CApp::Create(int width, int height, const char* window_name)
 	SetWindowLong(g_hWnd, GWL_USERDATA, (LONG)this);
 
 	m_stSys.SysInfo();
-	GetRender()->Init();
+	GetDevice()->Init();
 	srand((unsigned int)time(NULL));
 }
 
@@ -93,30 +93,29 @@ bool CApp::Loop()
 		else
 		{
 			QWORD curr_time = GetTimer()->GetTime();
-			float elpsed_time = GetTimer()->GetTimeMillisec(curr_time - last_time) * 0.001f;
+			float elapsed_time = GetTimer()->GetTimeMillisec(curr_time - last_time) * 0.001f;
 
-			m_fps.Run(elpsed_time);
-			Run(elpsed_time);
-			GetRender()->BeginScene(0xffff0000);
-			Draw(elpsed_time);
-			GetRender()->DrawString(avar("fps:%f  elpsed time:%f", m_fps.GetFps(), elpsed_time), Vec2F(0.0f,0.0f), eDT_Left | eDT_Top, 0xffffffff);
-			GetRender()->EndScene();
+			m_fps.Run(elapsed_time);
+			Run(elapsed_time);
+			GetDevice()->BeginScene(0xffff0000);
+			Draw(elapsed_time);
+#ifdef _DEBUG
+			DrawDebug(elapsed_time);
+#endif
+			GetDevice()->EndScene();
 
 			last_time = curr_time;
 		}
 	}
 
-	GetRender()->Release();
+	GetDevice()->Release();
 
 	return false;
 }
 
 void CApp::Run(float fElapsedTime)
 {
-//	GetAppCursor()->Update();
-//	Vec2I position = GetAppCursor()->GetPosition();
-
-//	DEBUG_TRACE("mouse:%d,%d\n", position.x, position.y);
+	GetAppCursor()->Update();
 }
 
 bool CApp::MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -128,4 +127,11 @@ bool CApp::MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 	return true;
+}
+
+void CApp::DrawDebug(float elapsed_time)
+{
+	GetDevice()->DrawString(avar("fps:%f  elapsed time:%f", m_fps.GetFps(), elapsed_time), Vec2F(0.0f,0.0f), eDT_Left | eDT_Top, 0xffffffff);
+	Vec2I mouse_pt = GetAppCursor()->GetPosition();
+	GetDevice()->DrawString(avar("mouse:%d %d", mouse_pt.x, mouse_pt.y),  Vec2F(0.0f,12.0f), eDT_Left | eDT_Top, 0xff00ff00);
 }

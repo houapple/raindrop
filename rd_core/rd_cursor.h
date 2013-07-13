@@ -6,7 +6,7 @@
 class CCursor
 {
 public:
-	Vec2I GetPosition() { Update(); return m_Position; }
+	Vec2I GetPosition() { return m_Position; }
 	void Update();
 
 private:

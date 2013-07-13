@@ -1,7 +1,7 @@
 #ifndef _RD_DEVICE_H
 #define _RD_DEVICE_H
 
-#include "../rd_render/rd_render.h"
+#include "../rd_render/interface_device.h"
 #include "../rd_core/rd_core.h"
 #include <d3d9.h>
 
@@ -11,6 +11,14 @@ struct VertexBase
 	DWORD color;
 };
 #define VertexBase_FVF	D3DFVF_XYZRHW | D3DFVF_DIFFUSE
+
+struct VertexBitmap
+{
+	float x, y, z, w;
+	float u, v;
+	DWORD color;
+};
+#define VertexBitmap_FVF D3DFVF_XYZRHW | D3DFVF_TEX1 | D3DFVF_DIFFUSE
 
 
 
@@ -27,7 +35,7 @@ struct stDeviceInfo
 };
 
 class CTextOut;
-class CDevice : public IRender
+class CDevice : public IDevice
 {
 public:
 	CDevice();
@@ -48,6 +56,7 @@ public:
 	void DrawLineList(const Vec2F* p, DWORD num, DWORD color);
 
 	void DrawString(const char* text, const Vec2F& pt, BYTE format, DWORD color);
+
 private:
 	IDirect3D9*				m_pD3D;
 	IDirect3DDevice9*		m_pD3DDevice;
@@ -58,7 +67,7 @@ private:
 	DWORD m_dwIBOffset;
 
 	HWND	m_hWnd;
-	RectF	m_CanvasRect;	
+	RectF	m_CanvasRect;
 	stDeviceInfo m_DeviceInfo;
 
 	CTextOut*	m_pTextOut;

@@ -53,12 +53,12 @@ int heuristic(Vec2I start, Vec2I end)
 {
 /*	int dx = abs(start.x - end.x);
 	int dy = abs(start.y - end.y);
-	int D = 5;
+	int D = 100;
 	if (dx > dy)
 		return D * dx;
 	else
 		return D * dy;
-		*/
+*/
 	return square_distance<int>(start, end);
 }
 

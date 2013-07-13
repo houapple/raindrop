@@ -1,6 +1,6 @@
 #include "rd_textout.h"
 #include "rd_utility.h"
-#include "../rd_render/rd_render.h"
+#include "../rd_render/interface_device.h"
 
 void CTextOut::Init(IDirect3DDevice9* pd3dd)
 {
